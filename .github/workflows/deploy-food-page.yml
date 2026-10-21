@@ -39,8 +39,10 @@ jobs:
 
       - name: Prepare page artifact
         run: |
-          mkdir -p _site
+          mkdir -p _site/images
+          cp report-artifact/lunch-report.html _site/index.html
           cp report-artifact/lunch-report.html _site/food.html
+          cp report-artifact/images/lunch-time.png _site/images/lunch-time.png
 
       - name: Upload page artifact
         uses: actions/upload-pages-artifact@v3
