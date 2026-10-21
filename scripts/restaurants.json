@@ -8,7 +8,13 @@
   {
     "name": "ballstaviken",
     "displayName": "Ballstaviken",
-    "url": "https://www.sabis.se/restaurang-ballstaviken",
+    "url": "https://www.sabis.se/restauranger-cafeer/vara-foretagsrestauranger/restaurang-ballstaviken/",
+    "manual_notes": "Usually posts weekly menu."
+  },
+  {
+    "name": "kantin",
+    "displayName": "Kantin",
+    "url": "https://kantin.kvartersmenyn.se/",
     "manual_notes": "Usually posts weekly menu."
   }
 ]
