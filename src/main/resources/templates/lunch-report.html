@@ -36,6 +36,13 @@
             font-size: 2.5rem;
         }
 
+        .weekday {
+            display: block;
+            margin-top: 8px;
+            color: #53635b;
+            font: 400 1rem Arial, sans-serif;
+        }
+
         .page-image {
             text-align: right;
         }
@@ -78,7 +85,7 @@
 <body>
 <main>
     <header class="page-title">
-        <h1>Lunch Menus</h1>
+        <h1>Solna's Catch of the Day<span class="weekday" th:text="${weekday}">Monday</span></h1>
             <div class="page-image">
                 <img th:src="${imagePath}" alt="It's lunchtime illustration">
             </div>
