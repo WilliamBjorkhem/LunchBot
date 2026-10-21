@@ -1,9 +1,14 @@
 const { chromium } = require("playwright");
 const fs = require("fs");
+const path = require("path");
 
 const restaurants = JSON.parse(
-  fs.readFileSync("/scripts/restaurants.json", "utf8")
+  fs.readFileSync(
+    path.join(__dirname, "restaurants.json"),
+    "utf8"
+  )
 );
+
 
 async function run() {
   const browser = await chromium.launch();
