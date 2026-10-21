@@ -1,0 +1,36 @@
+name: scrape-lunches
+
+on:
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Playwright
+        run: |
+          npm install playwright
+          npx playwright install chromium
+
+      - name: Fetch restaurant content
+        run: |
+          node scripts/fetch-pages.js
+
+      - name: Extract menus with Gemini
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python scripts/extract_menus.py
+
+      - name: Upload CSV
+        uses: actions/upload-artifact@v4
+        with:
+          name: lunch-menus
+          path: lunches.csv
