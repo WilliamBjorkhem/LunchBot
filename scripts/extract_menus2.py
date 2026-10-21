@@ -17,6 +17,10 @@ REPO_ROOT = SCRIPT_DIR.parent
 DATA_DIR = REPO_ROOT / "data"
 OUTPUT_FILE = REPO_ROOT / "menus.json"
 
+RESTAURANTS_FILE = (
+    SCRIPT_DIR / "restaurants.json"
+)
+
 MODELS = [
     "gemini-3.8-flash",
     "gemini-3.6-flash",
@@ -28,8 +32,6 @@ if not DATA_DIR.exists():
         f"Data directory not found: {DATA_DIR}"
     )
 
-RESTAURANTS_FILE = SCRIPT_DIR / "restaurants.json"
-
 restaurant_config = {
     entry["name"]: entry
     for entry in json.loads(
@@ -40,16 +42,14 @@ restaurant_config = {
 }
 
 PROMPT = """
-Extract today's lunch menu from all supplied content.
+Extract today's lunch menu.
 
-Use ALL provided files:
+Use ALL supplied files:
 - HTML
-- PDFs
 - Images
+- PDFs
 
 Return ONLY valid JSON.
-
-Expected format:
 
 {
   "name": "",
@@ -62,20 +62,13 @@ Expected format:
 }
 
 Rules:
-- name must contain the restaurant name.
-- lunchMenu must contain all lunch dishes found.
-- description may be empty if no description exists.
-- Do not include dates.
-- Do not include markdown.
-- Do not include explanations.
-- Do not wrap JSON in code fences.
-
-If no menu is found:
-
-{
-  "name": "",
-  "lunchMenu": []
-}
+- name = restaurant name
+- lunchMenu contains every lunch dish found
+- description may be empty
+- do not return markdown
+- do not return explanations
+- do not return code fences
+- if no menu can be found use an empty lunchMenu array
 """
 
 SUPPORTED_EXTENSIONS = {
@@ -90,23 +83,59 @@ SUPPORTED_EXTENSIONS = {
 
 results = []
 
+
+def clean_response(text):
+    text = text.strip()
+
+    if text.startswith("```"):
+        lines = text.splitlines()
+
+        if len(lines) > 1:
+            lines = lines[1:]
+
+        if (
+            lines and
+            lines[-1].strip() == "```"
+        ):
+            lines = lines[:-1]
+
+        text = "\n".join(lines)
+
+    first = text.find("{")
+    last = text.rfind("}")
+
+    if first >= 0 and last > first:
+        text = text[first:last + 1]
+
+    return text
+
+
 for restaurant_dir in sorted(DATA_DIR.iterdir()):
 
     if not restaurant_dir.is_dir():
         continue
 
-    print(f"Processing {restaurant_dir.name}")
+    print(
+        f"Processing {restaurant_dir.name}"
+    )
 
     contents = [PROMPT]
 
     file_count = 0
 
-    for file in sorted(restaurant_dir.iterdir()):
+    for file in sorted(
+        restaurant_dir.iterdir()
+    ):
 
-        if file.suffix.lower() not in SUPPORTED_EXTENSIONS:
+        if (
+            file.suffix.lower()
+            not in SUPPORTED_EXTENSIONS
+        ):
             continue
 
-        print(f"  Uploading {file.name}")
+        print(
+            f"  Uploading {file.name}"
+        )
 
         try:
             uploaded = client.files.upload(
@@ -124,7 +153,8 @@ for restaurant_dir in sorted(DATA_DIR.iterdir()):
 
     if file_count == 0:
         print(
-            f"  No supported files found for "
+            f"  No supported files "
+            f"found for "
             f"{restaurant_dir.name}"
         )
         continue
@@ -135,29 +165,37 @@ for restaurant_dir in sorted(DATA_DIR.iterdir()):
     for model in MODELS:
 
         try:
-            print(f"  Trying model: {model}")
+            print(
+                f"  Trying model: "
+                f"{model}"
+            )
 
-            response = client.models.generate_content(
-                model=model,
-                contents=contents,
-                config=types.GenerateContentConfig(
-                    temperature=0
+            response = (
+                client.models.generate_content(
+                    model=model,
+                    contents=contents,
+                    config=types.GenerateContentConfig(
+                        temperature=0
+                    )
                 )
             )
 
             chosen_model = model
 
             print(
-                f"  Success with {model}"
+                f"  Success with "
+                f"{model}"
             )
 
             break
 
         except Exception as ex:
             print(
-                f"  Model {model} failed:"
+                f"  Model {model} "
+                f"failed:"
             )
-            print(f"  {ex}")
+
+            print(ex)
 
     if response is None:
         print(
@@ -166,56 +204,55 @@ for restaurant_dir in sorted(DATA_DIR.iterdir()):
         )
         continue
 
-    raw_response = response.text or ""
-
-    debug_file = (
-        restaurant_dir
-        / "gemini_response.txt"
+    raw_response = (
+        response.text or ""
     )
 
-    debug_file.write_text(
+    (
+        restaurant_dir /
+        "gemini_response.txt"
+    ).write_text(
         raw_response,
         encoding="utf-8"
     )
 
-    text = raw_response.strip()
-
-    if text.startswith("```"):
-        lines = text.splitlines()
-
-        if lines:
-            lines = lines[1:]
-
-        if lines and lines[-1].strip() == "```":
-            lines = lines[:-1]
-
-        text = "\n".join(lines)
-
     try:
-        menu = json.loads(text)
+
+        menu = json.loads(
+            clean_response(
+                raw_response
+            )
+        )
 
         config = restaurant_config.get(
             restaurant_dir.name,
             {}
         )
-        
+
         final_menu = {
-            "name": (
+            "name":
                 menu.get("name")
-                or config.get("displayName")
-                or restaurant_dir.name
-            ),
-            "lunchMenu": menu.get(
-                "lunchMenu",
-                []
-            ),
-            "manual_notes": config.get(
-                "manual_notes",
-                ""
-            )
+                or config.get(
+                    "displayName"
+                )
+                or restaurant_dir.name,
+
+            "lunchMenu":
+                menu.get(
+                    "lunchMenu",
+                    []
+                ),
+
+            "manual_notes":
+                config.get(
+                    "manual_notes",
+                    ""
+                )
         }
-        
-        results.append(final_menu)
+
+        results.append(
+            final_menu
+        )
 
         print(
             f"  Parsed menu for "
@@ -225,21 +262,16 @@ for restaurant_dir in sorted(DATA_DIR.iterdir()):
     except Exception as ex:
 
         print(
-            f"Failed parsing response for "
+            f"Failed parsing "
             f"{restaurant_dir.name}"
         )
 
-        print(f"Parser error: {ex}")
+        print(ex)
 
-        print("Raw response follows:")
-        print(raw_response)
-
-        error_file = (
-            restaurant_dir
-            / "parse_error.txt"
-        )
-
-        error_file.write_text(
+        (
+            restaurant_dir /
+            "parse_error.txt"
+        ).write_text(
             raw_response,
             encoding="utf-8"
         )
