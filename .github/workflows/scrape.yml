@@ -1,0 +1,44 @@
+name: scrape-restaurants
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  
+jobs:
+  scrape-restaurants:
+    runs-on: 
+      - ubuntu-24.04
+    steps:
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+    
+      - name: Ask Gemini
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          PROMPT=$(cat .github/prompts/extract-lunches.txt)
+      
+          PAYLOAD=$(jq -n \
+            --arg prompt "$PROMPT" \
+            '{
+              contents: [
+                {
+                  parts: [
+                    {
+                      text: $prompt
+                    }
+                  ]
+                }
+              ]
+            }')
+      
+          RESPONSE=$(curl -s \
+            -H "x-goog-api-key: ${GEMINI_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -X POST \
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent" \
+            -d "$PAYLOAD")
+      
+          echo "$RESPONSE" | jq -r '.candidates[0].content.parts[0].text'
+            
