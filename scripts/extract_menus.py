@@ -5,11 +5,11 @@ from bs4 import BeautifulSoup
 import re
 
 INPUTS = {
-    "MR B & Me": "fetched/mrbnme.html",
-    "Ballstaviken": "fetched/ballstaviken.html",
+    "MR B & Me": "data/mrbnme/page.html",
+    "Ballstaviken": "data/ballstaviken/page.html",
 }
 
-OUTPUT = "fetched/restaurant_content.txt"
+OUTPUT = "data/restaurant_content.txt"
 
 
 def html_to_text(html):
