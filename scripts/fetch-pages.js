@@ -2,7 +2,7 @@ const { chromium } = require("playwright");
 const fs = require("fs");
 
 const restaurants = JSON.parse(
-  fs.readFileSync("restaurants.json", "utf8")
+  fs.readFileSync("/scripts/restaurants.json", "utf8")
 );
 
 async function run() {
