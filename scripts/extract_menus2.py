@@ -19,8 +19,8 @@ OUTPUT_FILE = REPO_ROOT / "menus.json"
 
 MODELS = [
     "gemini-3.8-flash",
-    "gemini-2.5-flash",
-    "gemini-2.5-pro"
+    "gemini-3.6-flash",
+    "gemini-3.5-flash-lite"
 ]
 
 if not DATA_DIR.exists():
