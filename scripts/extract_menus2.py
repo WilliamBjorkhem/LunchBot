@@ -78,7 +78,7 @@ for restaurant_dir in DATA_DIR.iterdir():
             contents.append(uploaded)
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-3.8-flash",
         contents=contents,
         config=types.GenerateContentConfig(
             temperature=0
