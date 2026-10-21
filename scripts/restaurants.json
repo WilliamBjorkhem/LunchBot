@@ -2,11 +2,13 @@
   {
     "name": "mrbnme",
     "displayName": "MR B & Me",
-    "url": "https://www.mrbnme.com/lunch"
+    "url": "https://www.mrbnme.com/lunch",
+    "manual_notes": "Publishes menu as image."
   },
   {
     "name": "ballstaviken",
-    "displayName": "Bällstaviken",
-    "url": "https://www.sabis.se/restaurang-ballstaviken"
+    "displayName": "Ballstaviken",
+    "url": "https://www.sabis.se/restaurang-ballstaviken",
+    "manual_notes": "Usually posts weekly menu."
   }
 ]
