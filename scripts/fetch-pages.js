@@ -18,9 +18,12 @@ async function run() {
   for (const restaurant of restaurants) {
     const page = await browser.newPage();
 
-    await page.goto(restaurant.url, {
-      waitUntil: "networkidle"
+    await page.goto(url, {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000
     });
+
+    await page.waitForTimeout(5000);
 
     const html = await page.content();
 
