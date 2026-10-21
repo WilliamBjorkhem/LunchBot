@@ -28,42 +28,54 @@ if not DATA_DIR.exists():
         f"Data directory not found: {DATA_DIR}"
     )
 
+RESTAURANTS_FILE = SCRIPT_DIR / "restaurants.json"
+
+restaurant_config = {
+    entry["name"]: entry
+    for entry in json.loads(
+        RESTAURANTS_FILE.read_text(
+            encoding="utf-8"
+        )
+    )
+}
+
 PROMPT = """
-Extract the lunch menu from all supplied content.
+Extract today's lunch menu from all supplied content.
 
 Use ALL provided files:
 - HTML
 - PDFs
 - Images
 
-You must make a best effort to identify:
-- restaurant name
-- available lunch days
-- meal descriptions
-
-Only return an empty days array if you have carefully
-examined every supplied file and no menu information exists.
-
-Always populate the restaurant field whenever the name
-can be determined from the supplied files.
-
 Return ONLY valid JSON.
 
 Expected format:
 
 {
-  "restaurant": "",
-  "days": [
+  "name": "",
+  "lunchMenu": [
     {
-      "date": "",
-      "meals": []
+      "name": "",
+      "description": ""
     }
   ]
 }
 
-Do not include markdown.
-Do not include explanations.
-Do not wrap the JSON in code fences.
+Rules:
+- name must contain the restaurant name.
+- lunchMenu must contain all lunch dishes found.
+- description may be empty if no description exists.
+- Do not include dates.
+- Do not include markdown.
+- Do not include explanations.
+- Do not wrap JSON in code fences.
+
+If no menu is found:
+
+{
+  "name": "",
+  "lunchMenu": []
+}
 """
 
 SUPPORTED_EXTENSIONS = {
@@ -182,13 +194,28 @@ for restaurant_dir in sorted(DATA_DIR.iterdir()):
     try:
         menu = json.loads(text)
 
-        menu["_source_directory"] = (
-            restaurant_dir.name
+        config = restaurant_config.get(
+            restaurant_dir.name,
+            {}
         )
-
-        menu["_model"] = chosen_model
-
-        results.append(menu)
+        
+        final_menu = {
+            "name": (
+                menu.get("name")
+                or config.get("displayName")
+                or restaurant_dir.name
+            ),
+            "lunchMenu": menu.get(
+                "lunchMenu",
+                []
+            ),
+            "manual_notes": config.get(
+                "manual_notes",
+                ""
+            )
+        }
+        
+        results.append(final_menu)
 
         print(
             f"  Parsed menu for "
