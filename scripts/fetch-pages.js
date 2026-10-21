@@ -1,16 +1,9 @@
 const { chromium } = require("playwright");
 const fs = require("fs");
 
-const restaurants = [
-  {
-    name: "mrbnme",
-    url: "https://www.mrbnme.com/lunch"
-  },
-  {
-    name: "ballstaviken",
-    url: "https://www.sabis.se/restaurang-ballstaviken"
-  }
-];
+const restaurants = JSON.parse(
+  fs.readFileSync("restaurants.json", "utf8")
+);
 
 async function run() {
   const browser = await chromium.launch();
@@ -18,8 +11,10 @@ async function run() {
   for (const restaurant of restaurants) {
     const page = await browser.newPage();
 
+    console.log(`Fetching ${restaurant.url}`);
+
     await page.goto(restaurant.url, {
-      waitUntil: 'domcontentloaded',
+      waitUntil: "domcontentloaded",
       timeout: 60000
     });
 
@@ -27,9 +22,10 @@ async function run() {
 
     const html = await page.content();
 
-    fs.mkdirSync(`data/${restaurant.name}`, {
-      recursive: true
-    });
+    fs.mkdirSync(
+      `data/${restaurant.name}`,
+      { recursive: true }
+    );
 
     fs.writeFileSync(
       `data/${restaurant.name}/page.html`,
@@ -52,17 +48,14 @@ async function run() {
       return urls;
     });
 
-    console.log(`\n${restaurant.name} assets:`);
-    for (const asset of assets) {
-      console.log(asset);
-    }
-
     fs.writeFileSync(
       `data/${restaurant.name}/assets.json`,
       JSON.stringify(assets, null, 2)
     );
 
-    console.log(`${restaurant.name}: found ${assets.length} assets`);
+    console.log(
+      `${restaurant.name}: found ${assets.length} assets`
+    );
   }
 
   await browser.close();
