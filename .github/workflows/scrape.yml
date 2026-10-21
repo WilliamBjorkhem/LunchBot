@@ -43,5 +43,5 @@ jobs:
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent" \
             -d "$PAYLOAD")
       
-          echo "$RESPONSE" | jq -r '.candidates[0].content.parts[0].text'
+          echo "$RESPONSE"
             
