@@ -1,25 +1,27 @@
-{
-  "name": "Mr.B & Me",
-  "lunchMenu": [
-    {
-      "name": "Fläskschnitzel med Bea",
-      "description": "Pommes Frites/Citron/Mixsallad/Bearnaisesås"
-    },
-    {
-      "name": "Krispig Kyckling \"Tokyo Heat\"",
-      "description": "Jasminris/Japansk-Sallad/Sesam-Dressing/Sesam Wasabimajonnäs (Mild)"
-    },
-    {
-      "name": "Vegansk Skogssvamp Pasta",
-      "description": "Rigatoni-pasta/Krämig Skogssvampsås/Ruccola/Prosociano-ost"
-    },
-    {
-      "name": "Mr.Bs Kalvfärsbiff med Grönpepparsås",
-      "description": "Kalvfärs/Potatisgratäng/Krämig Grönpepparsås/Haricots Verts"
-    },
-    {
-      "name": "Tigerräkor & Sriracha-majonnäs",
-      "description": "Jasminris/Mixsallad/Tomat/Gurka/Citron/Picklad Lök/5st-Tigerräkor"
-    }
-  ]
-}
+[
+  {
+    "name": "Mr.B & Me",
+    "lunchMenu": [
+      {
+        "name": "Fläskschnitzel med Bea",
+        "description": "Pommes Frites/Citron/Mixsallad/Bearnaisesås"
+      },
+      {
+        "name": "Krispig Kyckling \"Tokyo Heat\"",
+        "description": "Jasminris/Japansk-Sallad/Sesam-Dressing/Sesam Wasabimajonnäs (Mild)"
+      },
+      {
+        "name": "Vegansk Skogssvamp Pasta",
+        "description": "Rigatoni-pasta/Krämig Skogssvampsås/Ruccola/Prosociano-ost"
+      },
+      {
+        "name": "Mr.Bs Kalvfärsbiff med Grönpepparsås",
+        "description": "Kalvfärs/Potatisgratäng/Krämig Grönpepparsås/Haricots Verts"
+      },
+      {
+        "name": "Tigerräkor & Sriracha-majonnäs",
+        "description": "Jasminris/Mixsallad/Tomat/Gurka/Citron/Picklad Lök/5st-Tigerräkor"
+      }
+    ]
+  }
+]
