@@ -18,7 +18,7 @@ async function run() {
   for (const restaurant of restaurants) {
     const page = await browser.newPage();
 
-    await page.goto(url, {
+    await page.goto(restaurant.url, {
       waitUntil: 'domcontentloaded',
       timeout: 60000
     });
