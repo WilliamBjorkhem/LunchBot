@@ -1,0 +1,58 @@
+name: Publish to Confluence Data Center
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - food.html
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get current page version
+        env:
+          BASE: ${{ secrets.CONFLUENCE_BASE_URL }}
+          USER: ${{ secrets.CONFLUENCE_USER }}
+          TOKEN: ${{ secrets.CONFLUENCE_TOKEN }}
+          PAGE: ${{ secrets.CONFLUENCE_PAGE_ID }}
+        run: |
+          curl --fail --silent --show-error \
+            -u "$USER:$TOKEN" \
+            "$BASE/rest/api/content/$PAGE?expand=version,space" \
+            -o page.json
+
+      - name: Update page
+        env:
+          BASE: ${{ secrets.CONFLUENCE_BASE_URL }}
+          USER: ${{ secrets.CONFLUENCE_USER }}
+          TOKEN: ${{ secrets.CONFLUENCE_TOKEN }}
+          PAGE: ${{ secrets.CONFLUENCE_PAGE_ID }}
+        run: |
+          VERSION=$(jq '.version.number + 1' page.json)
+
+          jq --rawfile html report.html \
+             --argjson version "$VERSION" \
+             '{
+               id: .id,
+               type: "page",
+               title: .title,
+               space: {key: .space.key},
+               version: {number: $version},
+               body: {
+                 storage: {
+                   value: $html,
+                   representation: "storage"
+                 }
+               }
+             }' page.json > update.json
+
+          curl --fail --silent --show-error \
+            -u "$USER:$TOKEN" \
+            -X PUT \
+            -H "Content-Type: application/json" \
+            --data @update.json \
+            "$BASE/rest/api/content/$PAGE"
