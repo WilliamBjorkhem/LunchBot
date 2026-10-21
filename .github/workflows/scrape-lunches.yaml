@@ -19,6 +19,12 @@ jobs:
           npm install playwright
           npx playwright install chromium
 
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          pip install beautifulsoup4
+
       - name: Fetch restaurant content
         run: |
           node scripts/fetch-pages.js
