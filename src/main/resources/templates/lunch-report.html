@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lunch Menus</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: Georgia, "Times New Roman", serif;
+            color: #18332f;
+            background: #f4f3ed;
+        }
+
+        body {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+
+        .page-title {
+            display: table;
+            width: 100%;
+            margin: 0 0 32px;
+        }
+
+        .page-title h1,
+        .page-image {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .page-title h1 {
+            width: 70%;
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .page-image {
+            text-align: right;
+        }
+
+        .page-title img {
+            width: 178px;
+            height: 100px;
+            vertical-align: middle;
+        }
+
+        .restaurant {
+            margin: 0 0 32px;
+            padding-top: 20px;
+            border-top: 2px solid #a9b9a3;
+        }
+
+        h2 {
+            margin: 0 0 16px;
+            font-size: 1.6rem;
+        }
+
+        .menu-item {
+            padding: 12px 0;
+            border-top: 1px solid #d5d9ce;
+        }
+
+        .menu-item h3 {
+            margin: 0 0 4px;
+            font: 600 1rem Arial, sans-serif;
+        }
+
+        .menu-item p {
+            margin: 0;
+            color: #53635b;
+            font: 0.95rem/1.5 Arial, sans-serif;
+        }
+
+    </style>
+</head>
+<body>
+<main>
+    <header class="page-title">
+        <h1>Lunch Menus</h1>
+            <div class="page-image">
+                <img th:src="${imagePath}" alt="It's lunchtime illustration">
+            </div>
+    </header>
+    <section class="restaurant" th:each="restaurant : ${restaurants}">
+        <h2 th:text="${restaurant.name}">Restaurant name</h2>
+        <article class="menu-item" th:each="item : ${restaurant.lunchMenu}">
+            <h3 th:text="${item.name}">Menu item</h3>
+            <p th:text="${item.description}">Description</p>
+        </article>
+    </section>
+</main>
+</body>
+</html>

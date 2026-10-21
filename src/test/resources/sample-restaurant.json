@@ -1,0 +1,28 @@
+[
+  {
+    "name": "Cafe Central",
+    "lunchMenu": [
+      {
+        "name": "Tomato Soup",
+        "description": "Tomato soup with fresh basil"
+      },
+      {
+        "name": "Garden Salad",
+        "description": "Mixed greens with seasonal vegetables"
+      }
+    ]
+  },
+  {
+    "name": "Harbor Deli",
+    "lunchMenu": [
+      {
+        "name": "Turkey Sandwich",
+        "description": "Roasted turkey with lettuce and tomato"
+      },
+      {
+        "name": "Clam Chowder",
+        "description": "Creamy chowder with herbs"
+      }
+    ]
+  }
+]
