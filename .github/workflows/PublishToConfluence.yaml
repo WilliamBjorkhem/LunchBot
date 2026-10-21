@@ -15,26 +15,37 @@ jobs:
 
       - name: Get current page version
         env:
-          BASE: ${{ secrets.CONFLUENCE_BASE_URL }}
           USER: ${{ secrets.CONFLUENCE_USER }}
           TOKEN: ${{ secrets.CONFLUENCE_TOKEN }}
-          PAGE: ${{ secrets.CONFLUENCE_PAGE_ID }}
         run: |
+          set -euo pipefail
+          CONFIG=.github/confluence-target.json
+          jq -e '(.baseUrl | type == "string" and startswith("https://")) and (.pageId | type == "string" or type == "number") and (.title | type == "string" and length > 0)' "$CONFIG" >/dev/null
+          BASE=$(jq -r '.baseUrl' "$CONFIG")
+          PAGE=$(jq -r '.pageId | tostring' "$CONFIG")
+          EXPECTED_TITLE=$(jq -r '.title' "$CONFIG")
           curl --fail --silent --show-error \
             -u "$USER:$TOKEN" \
             "$BASE/rest/api/content/$PAGE?expand=version,space" \
             -o page.json
+          if ! jq -e --arg id "$PAGE" --arg title "$EXPECTED_TITLE" \
+            '(.id | tostring) == $id and .title == $title' page.json >/dev/null; then
+            echo "The response is not the expected Confluence page; refusing to continue."
+            exit 1
+          fi
 
       - name: Update page
         env:
-          BASE: ${{ secrets.CONFLUENCE_BASE_URL }}
           USER: ${{ secrets.CONFLUENCE_USER }}
           TOKEN: ${{ secrets.CONFLUENCE_TOKEN }}
-          PAGE: ${{ secrets.CONFLUENCE_PAGE_ID }}
         run: |
+          set -euo pipefail
+          CONFIG=.github/confluence-target.json
+          BASE=$(jq -r '.baseUrl' "$CONFIG")
+          PAGE=$(jq -r '.pageId | tostring' "$CONFIG")
           VERSION=$(jq '.version.number + 1' page.json)
 
-          jq --rawfile html report.html \
+          jq --rawfile html food.html \
              --argjson version "$VERSION" \
              '{
                id: .id,

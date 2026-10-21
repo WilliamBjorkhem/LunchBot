@@ -1,0 +1,47 @@
+name: Validate Confluence Target
+
+on:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read and verify target page
+        env:
+          USER: ${{ secrets.CONFLUENCE_USER }}
+          TOKEN: ${{ secrets.CONFLUENCE_TOKEN }}
+        run: |
+          set -euo pipefail
+          CONFIG=.github/confluence-target.json
+          jq -e '(.baseUrl | type == "string" and startswith("https://")) and (.pageId | type == "string" or type == "number") and (.title | type == "string" and length > 0)' "$CONFIG" >/dev/null
+          BASE=$(jq -r '.baseUrl' "$CONFIG")
+          PAGE=$(jq -r '.pageId | tostring' "$CONFIG")
+          EXPECTED_TITLE=$(jq -r '.title' "$CONFIG")
+          curl --fail --silent --show-error \
+            -u "$USER:$TOKEN" \
+            "$BASE/rest/api/content/$PAGE?expand=version,body.storage" \
+            -o page.json
+          if ! jq -e --arg id "$PAGE" --arg title "$EXPECTED_TITLE" \
+            '(.id | tostring) == $id and .title == $title' page.json >/dev/null; then
+            echo "The response is not the expected Confluence page; refusing to create preview."
+            exit 1
+          fi
+          {
+            printf 'Verified Confluence page\n'
+            printf 'Base URL: %s\n' "$BASE"
+            printf 'Page ID: %s\n' "$(jq -r '.id' page.json)"
+            printf 'Title: %s\n' "$(jq -r '.title' page.json)"
+            printf 'Version: %s\n\n' "$(jq -r '.version.number' page.json)"
+            printf 'Current storage content:\n\n'
+            jq -r '.body.storage.value // "[No storage content returned]"' page.json
+          } > confluence-page-preview.txt
+
+      - name: Upload page preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: confluence-page-preview
+          path: confluence-page-preview.txt
+          retention-days: 1
