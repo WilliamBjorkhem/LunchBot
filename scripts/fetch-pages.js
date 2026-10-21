@@ -52,6 +52,11 @@ async function run() {
       return urls;
     });
 
+    console.log(`\n${restaurant.name} assets:`);
+    for (const asset of assets) {
+      console.log(asset);
+    }
+
     fs.writeFileSync(
       `data/${restaurant.name}/assets.json`,
       JSON.stringify(assets, null, 2)
