@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import json
 import os
 from pathlib import Path
@@ -5,7 +7,9 @@ from pathlib import Path
 from google import genai
 from google.genai import types
 
-client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+client = genai.Client(
+    api_key=os.environ["GEMINI_API_KEY"]
+)
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent
@@ -13,20 +17,39 @@ REPO_ROOT = SCRIPT_DIR.parent
 DATA_DIR = REPO_ROOT / "data"
 OUTPUT_FILE = REPO_ROOT / "menus.json"
 
+MODELS = [
+    "gemini-3.8-flash",
+    "gemini-2.5-flash",
+    "gemini-2.5-pro"
+]
+
 if not DATA_DIR.exists():
     raise RuntimeError(
         f"Data directory not found: {DATA_DIR}"
     )
 
 PROMPT = """
-Extract the lunch menu.
+Extract the lunch menu from all supplied content.
 
 Use ALL provided files:
 - HTML
 - PDFs
 - Images
 
-Return ONLY valid JSON:
+You must make a best effort to identify:
+- restaurant name
+- available lunch days
+- meal descriptions
+
+Only return an empty days array if you have carefully
+examined every supplied file and no menu information exists.
+
+Always populate the restaurant field whenever the name
+can be determined from the supplied files.
+
+Return ONLY valid JSON.
+
+Expected format:
 
 {
   "restaurant": "",
@@ -38,69 +61,13 @@ Return ONLY valid JSON:
   ]
 }
 
-If no menu is found, return:
-
-{
-  "restaurant": "",
-  "days": []
-}
+Do not include markdown.
+Do not include explanations.
+Do not wrap the JSON in code fences.
 """
 
-results = []
-
-for restaurant_dir in DATA_DIR.iterdir():
-
-    if not restaurant_dir.is_dir():
-        continue
-
-    print(f"Processing {restaurant_dir.name}")
-
-    contents = [PROMPT]
-
-    for file in restaurant_dir.iterdir():
-
-        suffix = file.suffix.lower()
-
-        if suffix in {
-            ".html",
-            ".htm",
-            ".pdf",
-            ".png",
-            ".jpg",
-            ".jpeg",
-            ".webp"
-        }:
-
-            uploaded = client.files.upload(
-                file=str(file)
-            )
-
-            contents.append(uploaded)
-
-    response = client.models.generate_content(
-        model="gemini-3.8-flash",
-        contents=contents,
-        config=types.GenerateContentConfig(
-            temperature=0
-        )
-    )
-
-    try:
-        menu = json.loads(response.text)
-        results.append(menu)
-
-    except Exception:
-        print(
-            f"Failed parsing response for "
-            f"{restaurant_dir.name}"
-        )
-
-        print(response.text)
-
-with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-    json.dump(
-        results,
-        f,
-        indent=2,
-        ensure_ascii=False
-    )
+SUPPORTED_EXTENSIONS = {
+    ".html",
+    ".htm",
+    ".pdf",
+    ".png",
