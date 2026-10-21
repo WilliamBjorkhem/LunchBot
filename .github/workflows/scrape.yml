@@ -17,7 +17,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          PROMPT=$(cat .github/prompts/extract-lunches.txt)
+          PROMPT=$(cat .github/prompts/scrape_lunches_prompt.txt)
       
           PAYLOAD=$(jq -n \
             --arg prompt "$PROMPT" \
