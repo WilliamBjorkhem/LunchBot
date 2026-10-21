@@ -1,12 +1,12 @@
 name: Deploy food page to GitHub Pages
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+  workflow_run:
+    workflows: [Build lunch report]
+    types: [completed]
 
 permissions:
+  actions: read
   contents: read
   pages: write
   id-token: write
@@ -17,6 +17,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -25,13 +26,21 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Download lunch report
+        uses: actions/download-artifact@v4
+        with:
+          name: lunch-report
+          path: report-artifact
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
       - name: Prepare page artifact
         run: |
           mkdir -p _site
-          cp food.html _site/food.html
+          cp report-artifact/lunch-report.html _site/food.html
 
       - name: Upload page artifact
         uses: actions/upload-pages-artifact@v3
