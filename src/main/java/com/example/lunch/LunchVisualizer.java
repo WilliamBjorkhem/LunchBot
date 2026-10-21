@@ -7,7 +7,10 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
@@ -35,6 +38,8 @@ public class LunchVisualizer {
 
         Context context = new Context();
         context.setVariable("restaurants", restaurants);
+        context.setVariable("weekday", LocalDate.now().getDayOfWeek()
+            .getDisplayName(TextStyle.FULL, Locale.ENGLISH));
         String imagePath = "images/lunch-time.png";
         context.setVariable("imagePath", imagePath);
 
