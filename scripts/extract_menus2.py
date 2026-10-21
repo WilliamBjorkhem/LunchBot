@@ -1,11 +1,22 @@
 import json
 import os
-import pathlib
+from pathlib import Path
 
 from google import genai
 from google.genai import types
 
 client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent
+
+DATA_DIR = REPO_ROOT / "data"
+OUTPUT_FILE = REPO_ROOT / "menus.json"
+
+if not DATA_DIR.exists():
+    raise RuntimeError(
+        f"Data directory not found: {DATA_DIR}"
+    )
 
 PROMPT = """
 Extract the lunch menu.
@@ -37,7 +48,7 @@ If no menu is found, return:
 
 results = []
 
-for restaurant_dir in pathlib.Path("data").iterdir():
+for restaurant_dir in DATA_DIR.iterdir():
 
     if not restaurant_dir.is_dir():
         continue
@@ -50,7 +61,7 @@ for restaurant_dir in pathlib.Path("data").iterdir():
 
         suffix = file.suffix.lower()
 
-        if suffix in [
+        if suffix in {
             ".html",
             ".htm",
             ".pdf",
@@ -58,7 +69,7 @@ for restaurant_dir in pathlib.Path("data").iterdir():
             ".jpg",
             ".jpeg",
             ".webp"
-        ]:
+        }:
 
             uploaded = client.files.upload(
                 file=str(file)
@@ -86,7 +97,7 @@ for restaurant_dir in pathlib.Path("data").iterdir():
 
         print(response.text)
 
-with open("menus.json", "w") as f:
+with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
     json.dump(
         results,
         f,
