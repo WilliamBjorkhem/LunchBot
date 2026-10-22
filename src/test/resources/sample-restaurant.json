@@ -3,24 +3,24 @@
     "name": "Mr.B & Me",
     "lunchMenu": [
       {
-        "name": "Fläskschnitzel med Bea",
-        "description": "Pommes Frites/Citron/Mixsallad/Bearnaisesås"
+        "name": "Signature",
+        "description": "Fläskschnitzel med Bea, Pommes Frites/Citron/Mixsallad/Bearnaisesås"
       },
       {
-        "name": "Krispig Kyckling \"Tokyo Heat\"",
-        "description": "Jasminris/Japansk-Sallad/Sesam-Dressing/Sesam Wasabimajonnäs (Mild)"
+        "name": "Mr.Bs Kyckling",
+        "description": "Mr.Bs Kyckling \"Sweet and Spicy Bangkok\", Jasminris/Gurksallad/Aioli/ Lime & Chiliglaze (Mellanstark)/Sesam & Lök-Topping"
       },
       {
-        "name": "Vegansk Skogssvamp Pasta",
-        "description": "Rigatoni-pasta/Krämig Skogssvampsås/Ruccola/Prosociano-ost"
+        "name": "Mr.Bs Veg",
+        "description": "Vegansk Skogssvamp Pasta, Rigatoni-pasta/Krämig Skogssvampsås/Ruccola/Prosociano-ost"
       },
       {
-        "name": "Mr.Bs Kalvfärsbiff med Grönpepparsås",
-        "description": "Kalvfärs/Potatisgratäng/Krämig Grönpepparsås/Haricots Verts"
+        "name": "Extra",
+        "description": "Mr.Bs Raggmunk med Rökt Sidfläsk, Potatispannkaka/Lingonsylt/Skirat Smör/Crème Fraiche/Äpple"
       },
       {
-        "name": "Tigerräkor & Sriracha-majonnäs",
-        "description": "Jasminris/Mixsallad/Tomat/Gurka/Citron/Picklad Lök/5st-Tigerräkor"
+        "name": "Mr.Bs Räkor",
+        "description": "Tigerräkor & Sriracha-majonnäs, Jasminris/Mixsallad/Tomat/Gurka/ /Citron/Picklad Lök/5st-Tigerräkor"
       }
     ]
   }
